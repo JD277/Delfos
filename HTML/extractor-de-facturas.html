@@ -64,8 +64,8 @@
     <div
       class="h-20 flex items-center justify-between px-4 border-b border-gray-700 bg-black/20 overflow-hidden relative">
       <div class="flex items-center justify-center flex-1">
-        <img src="../IMG/Logo_equipo.png" alt="Logo Equipo"
-          class="h-12 w-auto object-contain transition-all duration-300 logo-full">
+        <img src="../IMG/Logo_empresa_noFondo.png" alt="Logo Empresa"
+          class="h-16 w-auto object-contain transition-all duration-300 logo-full">
         <i class="fas fa-eye text-2xl text-white logo-icon hidden"></i>
       </div>
       <!-- Internal Toggle for Mobile/Tablet -->
@@ -76,9 +76,11 @@
 
     <!-- User Profile -->
     <div class="p-6 border-b border-gray-700">
-      <div class="bg-blue-600 rounded-xl p-4 shadow-lg transform transition hover:scale-105">
+      <div class="rounded-xl p-4 shadow-lg transform transition hover:scale-105"
+        style="background-color: rgba(253, 90, 3, 1);">
         <div class="flex items-center space-x-3 mb-3">
-          <div class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-xl">
+          <div
+            class="w-10 h-10 rounded-full bg-white text-orange-600 flex items-center justify-center font-bold text-xl">
             <i class="fas fa-user"></i>
           </div>
           <div>
@@ -155,10 +157,10 @@
           class="text-gray-600 hover:text-primary focus:outline-none transition-transform active:scale-95">
           <i class="fas fa-bars text-2xl"></i>
         </button>
-        <h1 class="text-3xl font-bold text-gray-800">WELCOME <span id="welcomeUser"
-            class="text-primary">{Nombre}</span>!</h1>
+        <h1 class="text-3xl font-bold text-gray-800">BIENVENIDO <span id="welcomeUser"
+            class="text-orange-600 font-bold">{Nombre}</span>!</h1>
       </div>
-      <img src="../IMG/Logo_empresa.png" alt="Logo Empresa" class="h-12 w-auto object-contain">
+      <!-- Logo removed as per request -->
     </header>
 
     <!-- Scrollable Content Area -->
@@ -180,7 +182,7 @@
               <i class="fas fa-box-open text-amber-600"></i>
               Subida Progresiva de Facturas
             </h2>
-            <p class="text-gray-500 mb-6">Sube hasta 80 archivos y envíalos uno por uno cada 5 segundos</p>
+            <p class="text-gray-500 mb-6"> </p>
 
             <div
               class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors group">
@@ -225,20 +227,28 @@
         <!-- Toolbar -->
         <div
           class="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div class="bg-secondary text-white px-6 py-2 rounded-full text-sm font-bold shadow-md">
-            Productos Pendientes por Revisión
+          <!-- Tabs Container -->
+          <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+            <button id="tabPending" onclick="switchTab('pending')"
+              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm">
+              Productos Pendientes por Revisión
+            </button>
+            <button id="tabReviewed" onclick="switchTab('reviewed')"
+              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent">
+              Productos Revisados
+            </button>
           </div>
 
-          <div class="flex-1 w-full sm:w-auto flex gap-4">
+          <div class="w-full sm:w-64 flex gap-4">
             <div class="relative flex-1">
               <input type="text" placeholder="Buscar..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white shadow-sm text-sm">
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white shadow-sm text-sm">
               <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
             </div>
             <button onclick="exportVerifiedProductsToCSV()"
               class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2 whitespace-nowrap">
               <i class="fas fa-file-csv"></i>
-              Exportar verificados
+              <span class="hidden md:inline">Exportar</span>
             </button>
           </div>
         </div>
@@ -396,6 +406,7 @@
     let isFirstLoad = true;
     let currentProducts = [];
     let visibleCount = 20;
+    let currentTab = 'pending'; // 'pending' or 'reviewed'
 
     const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
@@ -493,11 +504,12 @@
 
       async function loadProducts() {
         const container = document.getElementById('productsTableContainer');
+        const isPending = currentTab === 'pending';
 
         const { data, error } = await supabaseClient
           .from('productos')
           .select('*')
-          .eq('revisado', false)
+          .eq('revisado', !isPending)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -513,7 +525,7 @@
         if (JSON.stringify(data) === JSON.stringify(currentProducts)) {
           if (isFirstLoad) {
             if (!data || data.length === 0) {
-              container.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">No hay productos pendientes.</div>';
+              container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No hay productos ${currentTab === 'pending' ? 'pendientes' : 'revisados'}.</div>`;
             }
             isFirstLoad = false;
           }
@@ -525,12 +537,42 @@
         renderProducts();
       }
 
+      window.switchTab = function (tab) {
+        if (currentTab === tab) return;
+        currentTab = tab;
+        visibleCount = 20; // Reset pagination
+        currentProducts = []; // Clear current data to force refresh
+        isFirstLoad = true; // Show loader logic
+
+        // Toggle Styles
+        const tabPending = document.getElementById('tabPending');
+        const tabReviewed = document.getElementById('tabReviewed');
+
+        if (tab === 'pending') {
+          tabPending.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm";
+          tabReviewed.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent";
+        } else {
+          tabReviewed.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm";
+          tabPending.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent";
+        }
+
+        // Show Loading
+        const container = document.getElementById('productsTableContainer');
+        container.innerHTML = `
+           <div class="flex items-center justify-center h-full text-gray-500 italic">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-3"></div>
+            Cargando productos...
+           </div>`;
+
+        loadProducts();
+      };
+
       function renderProducts() {
         const container = document.getElementById('productsTableContainer');
         const data = currentProducts;
 
         if (!data || data.length === 0) {
-          container.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">No hay productos pendientes.</div>';
+          container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No hay productos ${currentTab === 'pending' ? 'pendientes' : 'revisados'}.</div>`;
           return;
         }
 
@@ -540,9 +582,9 @@
         // Table Construction with Tailwind Classes
         let html = `
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-secondary text-white sticky top-0 z-10">
+                    <thead class="text-white sticky top-0 z-10" style="background-color: rgba(253, 90, 3, 1);">
                         <tr>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tl-lg">ID</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tl-lg">Fecha</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">SKU</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Título</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Precio</th>
@@ -550,49 +592,58 @@
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Marca</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Factura</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Imagen</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tr-lg text-center">Revisar</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider text-center">${currentTab === 'pending' ? 'Revisar' : 'Validado'}</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tr-lg text-center"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-blue-900 text-white">
+                    <tbody class="divide-y divide-gray-200 bg-white text-gray-800">
                 `;
 
         productsToShow.forEach(row => {
+          const date = new Date(row.created_at).toLocaleDateString();
+          const isChecked = currentTab === 'reviewed' ? 'checked' : '';
+          const actionCell = `<input type="checkbox" onchange="markAsReviewed('${row.id}', this.checked)" ${isChecked} class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 border-gray-300 cursor-pointer" />`;
+
           html += `
-                    <tr class="hover:bg-blue-800 transition-colors bg-blue-900/90 odd:bg-blue-900 even:bg-blue-800/80" data-id="${row.id}">
-                        <td class="p-4 text-sm text-blue-100 font-mono">${row.id.substring(0, 8)}...</td>
+                    <tr class="hover:bg-gray-100 transition-colors odd:bg-white even:bg-gray-50 text-gray-800" data-id="${row.id}">
+                        <td class="p-4 text-sm font-mono text-gray-600">${date}</td>
                         <td class="p-4">
                             <input type="text" data-field="sku" data-id="${row.id}" value="${(row.sku || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
                         </td>
                         <td class="p-4">
                             <input type="text" data-field="titulo" data-id="${row.id}" value="${(row.titulo || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
                         </td>
                         <td class="p-4">
                             <div class="flex items-center">
-                                <span class="text-blue-300 mr-1">$</span>
+                                <span class="text-gray-500 mr-1">$</span>
                                 <input type="number" step="0.01" data-field="precio" data-id="${row.id}" value="${row.precio || ''}" 
-                                class="w-20 bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 text-right" />
+                                class="w-20 bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 text-right" />
                             </div>
                         </td>
                         <td class="p-4">
                             <input type="number" data-field="cantidad" data-id="${row.id}" value="${row.cantidad || ''}" 
-                            class="w-16 bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 text-center" />
+                            class="w-16 bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 text-center" />
                         </td>
                         <td class="p-4">
                             <input type="text" data-field="marca" data-id="${row.id}" value="${(row.marca || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
                         </td>
                         <td class="p-4">
                             <input type="text" data-field="factura" data-id="${row.id}" value="${(row.factura || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 placeholder-blue-300/50" placeholder="---" />
+                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 placeholder-gray-400" placeholder="---" />
                         </td>
                         <td class="p-4">
-                            <a href="${row.url_imagen}" target="_blank" class="text-blue-300 hover:text-white underline text-sm">Ver</a>
+                            <a href="${row.url_imagen}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-sm">Ver</a>
                         </td>
                         <td class="p-4 text-center">
-                            <input type="checkbox" onchange="markAsReviewed('${row.id}')" 
-                            class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 cursor-pointer" />
+                            ${actionCell}
+                        </td>
+                        <td class="p-4 text-center">
+                             <button onclick="deleteProduct('${row.id}')" class="text-gray-400 hover:text-red-500 transition-colors focus:outline-none" title="Eliminar">
+                                 <i class="fas fa-trash"></i>
+                             </button>
                         </td>
                     </tr>
                 `;
@@ -691,18 +742,39 @@
         }
       }
 
-      window.markAsReviewed = async function (id) {
-        // Optimistic UI Update first? Or wait? Wait is safer.
-        const { error } = await supabaseClient.from('productos').update({ revisado: true }).eq('id', id);
+      window.markAsReviewed = async function (id, newState) {
+        const { error } = await supabaseClient.from('productos').update({ revisado: newState }).eq('id', id);
         if (error) {
-          alert('Error al marcar como revisado: ' + error.message);
+          alert('Error al actualizar estado: ' + error.message);
+          const checkbox = document.querySelector(`tr[data-id="${id}"] input[type="checkbox"]`);
+          if (checkbox) checkbox.checked = !newState;
         } else {
           const row = document.querySelector(`tr[data-id="${id}"]`);
           if (row) {
-            row.classList.add('opacity-0', 'transform', 'translate-x-4'); // Animate out
-            setTimeout(() => row.remove(), 300);
+            row.classList.add('opacity-0', 'transform', 'translate-x-4');
+            setTimeout(() => {
+              row.remove();
+              loadProducts();
+            }, 300);
           }
-          currentProducts = currentProducts.filter(p => p.id !== id);
+        }
+      };
+
+      window.deleteProduct = async function (id) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
+
+        const { error } = await supabaseClient.from('productos').delete().eq('id', id);
+        if (error) {
+          alert('Error al eliminar: ' + error.message);
+        } else {
+          const row = document.querySelector(`tr[data-id="${id}"]`);
+          if (row) {
+            row.classList.add('opacity-0', 'transform', 'scale-95');
+            setTimeout(() => {
+              row.remove();
+              loadProducts();
+            }, 300);
+          }
         }
       };
 

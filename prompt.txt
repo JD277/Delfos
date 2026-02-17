@@ -80,5 +80,22 @@ Modificaciones esteticas:
     - El toggle de la sidebar debe acompañar a la sidebar cuando se despliega, no debe quedarse en la misma posicion
     - En pantllas grandes (desktops), al dar click en el toggle, la sidebar que esta visible en predeterminado debe de ocultarse con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar, de igual manera al dar click en el toggle, la sidebar debe de aparecer con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar.    
 
+17/02/2026
+Correciones nuevas:
+- Cambio de idioma WELCOME a BIENVENIDO
+- Quitar parrafo "Sube hasta 80 archivos y envíalos uno por uno cada 5 segundos"
+- Reemplazar columna ID por una columna llamada "Fecha", cuyos datos serán de la columna "created_at" de la base de datos de Supabase
+- Cambiar colores de la tabla: primera fila será rgba(253, 90, 3) y las demás filas serán tono gris claro.
+- Cambiar colores en la sidebar: el color de fondo de la tarjeta de usuario será rgba(253, 90, 3) y el color general de la dashboard se mantendrá igual.
+- Cambiar de color la sección de "Productos Pendientes por Revisión", y añadir una sección al lado de "Productos Revisados", la sección en selección (por predeterminado "Productos Pendientes por Revisión") será de color de fondo rgba(253, 90, 3) y el color de la sección no seleccionada será de color de texto rgba(253, 90, 3) atenuado. Adapta el tamaño de la searchbar (reducir) para que entre bien este nueva sección de "Productos Revisados" (div)
+- Quitar tanto el logotipo "Logo_empresa.png" como el logotipo "Logo_equipo.png", donde estaba el "Logo_equipo.png" ahora colocar "Logo_empresa_noFondo.png".
+- Que el color de nombre de Usuario (después de BIENVENIDO) sea de color rgba(253, 90, 3).
+- En la sección de "Productos Revisados" cambia la columna de Estado por una columna llamada "Validado", y en lugar de que sea un check, tiene que ser un checkbox como el de la sección "Productos Pendientes por Revisión" para que el usuario pueda marcar y desmarcar el producto como validado.
+- Aumenta levemente (1 o 2 puntos) el tamaño de la imagen "Logo_empresa_noFondo.png".
+- Al final despues de la columna Revisar debe haber una columna nueva sin nombre, tan solo un icono de "papelera" que al darle click, se eliminará el producto de la lista.
+
+
+
+
 
 
