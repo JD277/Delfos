@@ -1,0 +1,84 @@
+Login:
+Actúa como un desarrollador Senior Frontend. 
+Crea una página de inicio de sesión (Login) profesional y moderna. 
+
+Especificaciones técnicas y de diseño:
+- Tecnologías: HTML5, CSS3 (puedes usar Tailwind CSS para el estilo) y JavaScript vanilla.
+- Interfaz: Un contenedor elegante y centrado vertical y horizontalmente, con sombras suaves y bordes redondeados.
+- Campos: Input para 'Correo Electrónico' (con validación de tipo email) e Input para 'Contraseña' (con enmascaramiento de caracteres).
+- Funcionalidad: Validación básica de campos obligatorios mediante JavaScript antes de simular el envío.
+- Estética: Diseño minimalista, paleta de colores profesional (White y Orange), tipografía moderna y totalmente responsivo para dispositivos móviles.
+- Restricción: No incluyas ninguna sección, enlace o botón para 'Registrarse' o 'Crear cuenta'.
+
+Animaciones: 
+- Al cargar la página, el contenedor debe aparecer con una animación de fade-in y slide-up.
+- Los campos de entrada deben tener un efecto de focus con un borde animado.
+- El botón de inicio de sesión debe tener un efecto de hover con un cambio de color y un ligero aumento de tamaño.
+- Al enviar el formulario, debe aparecer un mensaje de error o éxito con una animación de fade-in y slide-up.
+
+Estructura de carpeta:
+- CSS
+- HTML
+- JS
+- IMG
+
+Limitaciones:
+- No incluyas ninguna sección, enlace o botón para 'Registrarse' o 'Crear cuenta'.
+- No hay opcion de "Olvide la contraseña" (la creación y asignación de usuarios y contraseña será manual)
+
+Cambios:
+- Errores contextuales, especificar que parte ha dado error en especifico 
+- Redireccionamiento directo y almacenamiento temporal de datos en local (nombre de usuario, tipo de usuario y email de usuario)
+
+Extractor de facturas:
+Actúa como desarrollador Frontend Senior.
+Realiza la conexión de redireccionamiento entre el Login (al ser validado) a la nueva página "extractor-de-facturas.html", con un timeout de 1500 ms.
+Mostrando que ha sido verificado como valido el usuario y contraseña.
+Con una estructura como:
+    window.location.href = 'extractor-de-facturas.html'; // Ajusta la ruta relativa según donde coloques el archivo
+
+Cambios esteticos: (Img Figma Referencia)
+- IMPORTANTE: Elementos de lógica (subir archivos, rellenar campos, botones, revisar, ver imágen) mantendrán su lógica original
+- El resto de elementos deben seguir el diseño de la imagen de referencia.
+- Mantener la estructura de la página, pero con el nuevo diseño.
+- Colores: Usar colores del Figma (azul), pero con el nuevo diseño, el color es temporal.
+- Tipografía: Usar la tipografía del Figma (Inter).
+- Animaciones: Hacer que la lista de "Productos Pendientes por Revisión" sea una lista scrolleable.
+
+Notas de placeholders:
+- Barra de busqueda: sin lógica, solo placeholder
+    En la Sidebar:
+- Inforamción personal: en el recuadro superior izquierdo se deberá ver la información personal (nombre, tipo y email) del usuario.
+- Crear Boton "Subir Facturas": sin lógica, solo placeholder
+- Crear Boton "Subir guías": sin lógica, solo placeholder
+- Crear Boton "Ver Productos": sin lógica, solo placeholder
+- Crear Boton "Tracking ML": sin lógica, solo placeholder
+
+Modificaciones esteticas:
+    (1) Paginación:
+- Estado inicial: traerá los 20 primeros items de la base de datos.
+- Boton: "Mostrar más", desplegará 20 productos más de la lista, solo activo mientras existan productos por mostrar.
+- Boton: "Mostrar menos", ocultará los últimos 20 productos de la lista, solo activo mientras existan más de 20 productos mostrados.
+- Boton: "Mostrar todos", mostrará todos los productos de la lista.
+
+    (2) Logotipo:
+- El logotipo actual (superior derecha) es un placeholder, se debe reemplazar por el "Logo_empresa.png" (placeholder montaña).
+- El logotipo actual (sidebar, superior izquierda) es un placeholder, se debe reemplazar por el "Logo_equipo.png" (placeholder ojo).
+
+    (3) responsiveness:
+- Sidebar: la sidebar será un desplegable y responsiva, mediante las Tecnologías usadas (HTML5, CSS, JS)
+    - En pantallas pequeñas (móviles), la sidebar se ocultará y aparecerá un botón de menú para desplegarla.
+    - En pantallas medianas (tablets), la sidebar se mostrará parcialmente y aparecerá un botón de menú para desplegarla completamente.
+    - En pantallas grandes (desktops), la sidebar se mostrará completamente y aparecerá un botón de menú para ocultarla.
+    - HTML: Usa etiquetas semánticas (<nav>, <aside>, <ul>). Incluye un botón de "toggle" con un "hamburger" icono (puedes usar un placeholder para el icono).
+    - CSS: Añade transiciones suaves (transition) para el cambio de ancho, la sidebar debe ser "collapsible" (ancho total vs. ancho de solo iconos).
+    - Asegura que sea totalmente responsiva (en móviles debería ocultarse por completo o volverse un menú inferior).
+    - JS: Añade la lógica para el "toggle" de la sidebar, con la estructura:
+        - Usa classList.toggle para manejar el estado de apertura/cierre.
+        Asegura que el estado se mantenga mediante una clase en el body o el contenedor principal.
+    Correcciones:
+    - El toggle de la sidebar debe acompañar a la sidebar cuando se despliega, no debe quedarse en la misma posicion
+    - En pantllas grandes (desktops), al dar click en el toggle, la sidebar que esta visible en predeterminado debe de ocultarse con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar, de igual manera al dar click en el toggle, la sidebar debe de aparecer con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar.    
+
+
+

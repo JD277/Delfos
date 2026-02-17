@@ -91,8 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // We use loose equality (==) to match if DNI is stored as number vs string
             if (user.dni == password) {
                 console.log('Login Success:', user);
-                showMessage('¡Credenciales válidas! Acceso permitido.', 'success');
-                // No redirect, just validation confirmation
+                // Save user session
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showMessage('¡Credenciales válidas! Acceso permitido. Redirigiendo...', 'success');
+                // Redirection after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = 'extractor-de-facturas.html';
+                }, 1500);
             } else {
                 // DNI incorrect
                 console.warn('Login Failed: Invalid DNI');

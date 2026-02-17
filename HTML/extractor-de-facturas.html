@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Extractor de Facturas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb', // Blue-600
+            secondary: '#1e40af', // Blue-800
+            sidebar: '#1e293b', // Slate-800
+            accent: '#ff6b00', // Orange from login
+            success: '#10b981',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* Custom Scrollbar for Table */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .sidebar-link {
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 font-sans h-screen flex overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed md:relative inset-y-0 left-0 z-30 w-64 bg-sidebar text-white flex flex-col shadow-2xl transition-all duration-300 transform -translate-x-full md:translate-x-0 md:w-20 lg:w-64 origin-left">
+    <!-- Logo Area -->
+    <div
+      class="h-20 flex items-center justify-between px-4 border-b border-gray-700 bg-black/20 overflow-hidden relative">
+      <div class="flex items-center justify-center flex-1">
+        <img src="../IMG/Logo_equipo.png" alt="Logo Equipo"
+          class="h-12 w-auto object-contain transition-all duration-300 logo-full">
+        <i class="fas fa-eye text-2xl text-white logo-icon hidden"></i>
+      </div>
+      <!-- Internal Toggle for Mobile/Tablet -->
+      <button id="sidebarClose" class="md:hidden text-gray-400 hover:text-white focus:outline-none absolute right-4">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- User Profile -->
+    <div class="p-6 border-b border-gray-700">
+      <div class="bg-blue-600 rounded-xl p-4 shadow-lg transform transition hover:scale-105">
+        <div class="flex items-center space-x-3 mb-3">
+          <div class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-xl">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm" id="userName">Usuario</h3>
+            <p class="text-xs text-blue-200" id="userRole">Rol</p>
+          </div>
+        </div>
+        <p class="text-xs text-blue-100 truncate sidebar-text" id="userEmail">email@ejemplo.com</p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 relative group">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text">Dashboard</span>
+      </a>
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg bg-gray-700 text-white shadow-md relative group">
+        <i class="fas fa-file-upload w-6 text-center"></i>
+        <span class="sidebar-text">Subida de Facturas</span>
+      </a>
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 relative group">
+        <i class="fas fa-eye w-6 text-center"></i>
+        <span class="sidebar-text">Ver guías</span>
+      </a>
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 relative group">
+        <i class="fas fa-cloud-upload-alt w-6 text-center"></i>
+        <span class="sidebar-text">Subir guías</span>
+      </a>
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 relative group">
+        <i class="fas fa-box w-6 text-center"></i>
+        <span class="sidebar-text">Ver Productos</span>
+      </a>
+      <a href="#"
+        class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 relative group">
+        <i class="fas fa-chart-line w-6 text-center"></i>
+        <span class="sidebar-text">Tracking ML</span>
+      </a>
+    </nav>
+
+    <!-- Footer / Toggle -->
+    <div class="p-4 border-t border-gray-700">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">v1.2.0</span>
+        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+          <input type="checkbox" name="toggle" id="toggle"
+            class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+          <label for="toggle"
+            class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 flex flex-col bg-gray-100 overflow-hidden relative">
+    <!-- Background Decorative Elements -->
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
+      <svg class="absolute top-0 right-0 w-1/2 h-full text-orange-300" fill="currentColor" viewBox="0 0 100 100"
+        preserveAspectRatio="none">
+        <path d="M0 100 C 20 0 50 0 100 100 Z"></path>
+      </svg>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm z-10 p-6 flex justify-between items-center relative">
+      <div class="flex items-center gap-4">
+        <button id="sidebarToggle"
+          class="text-gray-600 hover:text-primary focus:outline-none transition-transform active:scale-95">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <h1 class="text-3xl font-bold text-gray-800">WELCOME <span id="welcomeUser"
+            class="text-primary">{Nombre}</span>!</h1>
+      </div>
+      <img src="../IMG/Logo_empresa.png" alt="Logo Empresa" class="h-12 w-auto object-contain">
+    </header>
+
+    <!-- Scrollable Content Area -->
+    <div class="flex-1 overflow-y-auto p-8 relative z-10 custom-scrollbar">
+
+      <!-- Upload Section -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-2 h-full bg-accent"></div>
+        <div class="flex items-start space-x-6">
+          <!-- Date Circle -->
+          <div
+            class="hidden md:flex flex-col items-center justify-center w-24 h-24 bg-gray-800 text-white rounded-full shadow-lg border-4 border-gray-100 z-10">
+            <span class="text-2xl font-bold" id="currentDateDay">15</span>
+            <span class="text-sm uppercase" id="currentDateMonth">FEB</span>
+          </div>
+
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+              <i class="fas fa-box-open text-amber-600"></i>
+              Subida Progresiva de Facturas
+            </h2>
+            <p class="text-gray-500 mb-6">Sube hasta 80 archivos y envíalos uno por uno cada 5 segundos</p>
+
+            <div
+              class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors group">
+              <h3 class="text-lg font-semibold text-gray-700 mb-4 group-hover:text-primary transition-colors">• Subir
+                archivos</h3>
+
+              <div class="max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center">
+                <label
+                  class="flex-1 w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-2 flex items-center shadow-sm hover:shadow-md transition">
+                  <span class="px-3 py-1 bg-gray-200 rounded text-sm font-medium mr-3">Elegir</span>
+                  <span class="text-sm text-gray-500 truncate" id="fileNameDisplay">Sin archivos seleccionados</span>
+                  <input type="file" id="fileInput" multiple accept="image/*" class="hidden"
+                    onchange="updateFileNameDisplay()" />
+                </label>
+              </div>
+
+              <div class="mt-6 flex justify-start max-w-xl mx-auto">
+                <button id="uploadBtn" onclick="startUpload()"
+                  class="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition transform hover:scale-105 flex items-center gap-2">
+                  <span>Enviar archivos</span>
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+
+              <!-- Progress -->
+              <div class="progress-container hidden mt-6 max-w-xl mx-auto" id="progressContainer">
+                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-300 overflow-hidden">
+                  <div class="bg-primary h-2.5 rounded-full" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div id="progressText" class="text-sm text-gray-500 mt-2">Preparando...</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Section -->
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col h-[600px]">
+        <!-- Fixed height for table container -->
+
+        <!-- Toolbar -->
+        <div
+          class="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="bg-secondary text-white px-6 py-2 rounded-full text-sm font-bold shadow-md">
+            Productos Pendientes por Revisión
+          </div>
+
+          <div class="flex-1 w-full sm:w-auto flex gap-4">
+            <div class="relative flex-1">
+              <input type="text" placeholder="Buscar..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white shadow-sm text-sm">
+              <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+            </div>
+            <button onclick="exportVerifiedProductsToCSV()"
+              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2 whitespace-nowrap">
+              <i class="fas fa-file-csv"></i>
+              Exportar verificados
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Table Wrapper -->
+        <div class="flex-1 overflow-auto custom-scrollbar relative p-0" id="productsTableContainer">
+          <div class="flex items-center justify-center h-full text-gray-500 italic">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+            Cargando productos...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- LOGIC SCRIPT (Preserved & Adapted) -->
+  <script>
+    // --- UI Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set Date
+      const now = new Date();
+      const day = now.getDate().toString().padStart(2, '0');
+      const month = now.toLocaleString('default', { month: 'short' });
+      document.getElementById('currentDateDay').textContent = day;
+      document.getElementById('currentDateMonth').textContent = month;
+
+      // Load User Data
+      const userJson = localStorage.getItem('currentUser');
+      if (userJson) {
+        try {
+          const user = JSON.parse(userJson);
+          document.getElementById('userName').textContent = user.nombre || 'Usuario';
+          document.getElementById('welcomeUser').textContent = user.nombre || 'Usuario';
+          document.getElementById('userEmail').textContent = user.correo || '';
+          document.getElementById('userRole').textContent = user.tipo || 'Usuario';
+        } catch (e) {
+          console.error('Error parsing user data', e);
+        }
+      } else {
+        // Optional: Redirect to login if not authenticated
+        // window.location.href = 'index.html';
+        console.warn('No user session found.');
+      }
+
+      setupSidebarToggle();
+    });
+
+    function setupSidebarToggle() {
+      const toggleBtn = document.getElementById('sidebarToggle');
+      const closeBtn = document.getElementById('sidebarClose');
+      const sidebar = document.getElementById('sidebar');
+      const logoFull = sidebar.querySelector('.logo-full');
+      const logoIcon = sidebar.querySelector('.logo-icon');
+      const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
+      const userEmail = document.getElementById('userEmail');
+
+      function toggleSidebar() {
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+          // Mobile: Toggle visibility (translate)
+          sidebar.classList.toggle('-translate-x-full');
+        } else {
+          // Desktop: Toggle Full Visibility (w-64 vs w-0)
+          const isHidden = sidebar.classList.contains('w-0');
+
+          if (isHidden) {
+            // Show
+            sidebar.classList.remove('w-0', 'overflow-hidden');
+            sidebar.classList.add('w-64');
+            // Show Content
+            sidebarTexts.forEach(el => el.classList.remove('hidden'));
+            userEmail.classList.remove('hidden');
+            logoFull.classList.remove('hidden');
+            logoIcon.classList.add('hidden');
+          } else {
+            // Hide Completely
+            sidebar.classList.remove('w-64');
+            sidebar.classList.add('w-0', 'overflow-hidden');
+            // Hide Content
+            sidebarTexts.forEach(el => el.classList.add('hidden'));
+            userEmail.classList.add('hidden');
+            logoFull.classList.add('hidden');
+            logoIcon.classList.add('hidden');
+          }
+        }
+      }
+
+      toggleBtn.addEventListener('click', toggleSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', () => {
+        // Specific close action for mobile internal button
+        sidebar.classList.add('-translate-x-full');
+      });
+
+      // Handle Resize
+      window.addEventListener('resize', () => {
+        const width = window.innerWidth;
+        if (width >= 768) {
+          sidebar.classList.remove('-translate-x-full');
+          // Ensure visible if it was hidden by mobile interaction?
+          // If it was w-0 (desktop hidden), keep it w-0? 
+          // Let's reset to default Expanded on resize to Desktop for simplicity
+          if (sidebar.classList.contains('w-0')) {
+            // Keep hidden if user hid it? Or reset? 
+            // Usually reset is safer to avoid "missing" sidebar
+          }
+        } else {
+          // Mobile default is hidden
+          sidebar.classList.add('-translate-x-full');
+          sidebar.classList.remove('w-0', 'overflow-hidden');
+          sidebar.classList.add('w-64');
+          sidebarTexts.forEach(el => el.classList.remove('hidden'));
+          userEmail.classList.remove('hidden');
+          logoFull.classList.remove('hidden');
+          logoIcon.classList.add('hidden');
+        }
+      });
+
+
+
+      // Initialize state based on screen size (Optional, CSS handles most, but JS syncs text)
+      const width = window.innerWidth;
+      if (width >= 768 && width < 1024) {
+        // Default Tablet State: Collapsed
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-20');
+        sidebarTexts.forEach(el => el.classList.add('hidden'));
+        userEmail.classList.add('hidden');
+        logoFull.classList.add('hidden');
+        logoIcon.classList.remove('hidden');
+      }
+    }
+
+    function updateFileNameDisplay() {
+      const input = document.getElementById('fileInput');
+      const display = document.getElementById('fileNameDisplay');
+      if (input.files.length > 0) {
+        display.textContent = `${input.files.length} archivo(s) seleccionado(s)`;
+        display.classList.remove('text-gray-500');
+        display.classList.add('text-gray-800', 'font-medium');
+      } else {
+        display.textContent = 'Sin archivos seleccionados';
+        display.classList.add('text-gray-500');
+        display.classList.remove('text-gray-800', 'font-medium');
+      }
+    }
+
+
+    // --- LOGIC FROM ORIGINAL FILE ---
+    let supabaseClient;
+    let filesToUpload = [];
+    let uploadIndex = 0;
+    let isUploading = false;
+    let isFirstLoad = true;
+    let currentProducts = [];
+    let visibleCount = 20;
+
+    const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
+
+    // Async Load Supabase
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    script.async = true;
+    script.onload = () => initializeApp();
+    script.onerror = () => console.error('Error al cargar Supabase.');
+    document.head.appendChild(script);
+
+    function initializeApp() {
+      const { createClient } = window.supabase;
+      supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      startApp();
+    }
+
+    function startApp() {
+      const WEBHOOK_URL = 'https://fixtop-n8n.depzyb.easypanel.host/webhook/980a3ae4-0cad-46b9-af95-f4365eab7d82';
+
+      // --- Funciones de subida ---
+      function sanitizeFilename(name) {
+        return name.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase();
+      }
+
+      async function uploadFileToSupabase(file, safeName) {
+        const { error } = await supabaseClient.storage.from('facturas').upload(safeName, file, { upsert: false });
+        if (error) throw new Error(error.message);
+        return `${SUPABASE_URL}/storage/v1/object/public/facturas/${safeName}`;
+      }
+
+      async function sendToWebhook(imageUrl, filename) {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageUrl, filename })
+        });
+        if (!res.ok) throw new Error(`Webhook falló: ${res.status}`);
+      }
+
+      function updateProgress(current, total, message) {
+        const percent = Math.round((current / total) * 100);
+        document.getElementById('progressBar').style.width = `${percent}%`;
+        document.getElementById('progressText').textContent = `${message} (${current}/${total})`;
+      }
+
+      async function processNextFile() {
+        if (uploadIndex >= filesToUpload.length || !isUploading) return;
+
+        const file = filesToUpload[uploadIndex];
+        const safeName = sanitizeFilename(file.name);
+        updateProgress(uploadIndex + 1, filesToUpload.length, `Subiendo ${file.name}...`);
+
+        try {
+          const imageUrl = await uploadFileToSupabase(file, safeName);
+          await sendToWebhook(imageUrl, safeName);
+        } catch (err) {
+          console.error('Error:', err);
+          // alert(`Error en ${file.name}: ${err.message}`); // Silent error for better UX? or Toast?
+        }
+
+        uploadIndex++;
+
+        if (uploadIndex < filesToUpload.length) {
+          setTimeout(processNextFile, 5000);
+        } else {
+          isUploading = false;
+          document.getElementById('uploadBtn').disabled = false;
+          document.getElementById('productUploadBtnText').textContent = 'Enviar archivos'; // Reset Text
+          document.getElementById('progressText').textContent = '✅ Envío completado.';
+          loadProducts(); // Actualizar tabla
+        }
+      }
+
+      window.startUpload = function () {
+        const files = Array.from(document.getElementById('fileInput').files);
+        if (files.length === 0) return alert('Selecciona al menos un archivo.');
+        if (files.length > 80) return alert('Máximo 80 archivos por lote.');
+
+        filesToUpload = files;
+        uploadIndex = 0;
+        isUploading = true;
+
+        document.getElementById('progressContainer').classList.remove('hidden');
+        document.getElementById('uploadBtn').disabled = true;
+        // document.getElementById('uploadBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('progressBar').style.width = '0%';
+        document.getElementById('progressText').textContent = 'Preparando...';
+
+        processNextFile();
+      };
+
+      // --- Gestión de productos con edición en línea ---
+
+      async function loadProducts() {
+        const container = document.getElementById('productsTableContainer');
+
+        const { data, error } = await supabaseClient
+          .from('productos')
+          .select('*')
+          .eq('revisado', false)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          container.innerHTML = `
+                        <div class="flex items-center justify-center h-full text-red-500">
+                             ❌ Error al cargar productos: ${error.message}
+                        </div>`;
+          isFirstLoad = false;
+          return;
+        }
+
+        // Evitar refresco si los datos no cambiaron
+        if (JSON.stringify(data) === JSON.stringify(currentProducts)) {
+          if (isFirstLoad) {
+            if (!data || data.length === 0) {
+              container.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">No hay productos pendientes.</div>';
+            }
+            isFirstLoad = false;
+          }
+          return;
+        }
+
+        currentProducts = data;
+        isFirstLoad = false;
+        renderProducts();
+      }
+
+      function renderProducts() {
+        const container = document.getElementById('productsTableContainer');
+        const data = currentProducts;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">No hay productos pendientes.</div>';
+          return;
+        }
+
+        const productsToShow = data.slice(0, visibleCount);
+        const total = data.length;
+
+        // Table Construction with Tailwind Classes
+        let html = `
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-secondary text-white sticky top-0 z-10">
+                        <tr>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tl-lg">ID</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">SKU</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Título</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Precio</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Cantidad</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Marca</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Factura</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Imagen</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tr-lg text-center">Revisar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-blue-900 text-white">
+                `;
+
+        productsToShow.forEach(row => {
+          html += `
+                    <tr class="hover:bg-blue-800 transition-colors bg-blue-900/90 odd:bg-blue-900 even:bg-blue-800/80" data-id="${row.id}">
+                        <td class="p-4 text-sm text-blue-100 font-mono">${row.id.substring(0, 8)}...</td>
+                        <td class="p-4">
+                            <input type="text" data-field="sku" data-id="${row.id}" value="${(row.sku || '').replace(/"/g, '&quot;')}" 
+                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                        </td>
+                        <td class="p-4">
+                            <input type="text" data-field="titulo" data-id="${row.id}" value="${(row.titulo || '').replace(/"/g, '&quot;')}" 
+                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center">
+                                <span class="text-blue-300 mr-1">$</span>
+                                <input type="number" step="0.01" data-field="precio" data-id="${row.id}" value="${row.precio || ''}" 
+                                class="w-20 bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 text-right" />
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <input type="number" data-field="cantidad" data-id="${row.id}" value="${row.cantidad || ''}" 
+                            class="w-16 bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 text-center" />
+                        </td>
+                        <td class="p-4">
+                            <input type="text" data-field="marca" data-id="${row.id}" value="${(row.marca || '').replace(/"/g, '&quot;')}" 
+                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1" />
+                        </td>
+                        <td class="p-4">
+                            <input type="text" data-field="factura" data-id="${row.id}" value="${(row.factura || '').replace(/"/g, '&quot;')}" 
+                            class="w-full bg-transparent border-b border-blue-400 text-white focus:outline-none focus:border-white transition-colors text-sm px-1 py-1 placeholder-blue-300/50" placeholder="---" />
+                        </td>
+                        <td class="p-4">
+                            <a href="${row.url_imagen}" target="_blank" class="text-blue-300 hover:text-white underline text-sm">Ver</a>
+                        </td>
+                        <td class="p-4 text-center">
+                            <input type="checkbox" onchange="markAsReviewed('${row.id}')" 
+                            class="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 cursor-pointer" />
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += '</tbody></table>';
+
+        const canShowMore = visibleCount < total;
+        const canShowLess = visibleCount > 20;
+
+        html += `
+            <div class="flex justify-center items-center p-4 space-x-4 bg-white border-t border-gray-200">
+                <button onclick="showLess()" class="${canShowLess ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowLess ? 'disabled' : ''}>
+                    Mostrar menos
+                </button>
+                <div class="h-4 w-px bg-gray-300"></div>
+                <button onclick="showMore()" class="${canShowMore ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowMore ? 'disabled' : ''}>
+                    Mostrar más
+                </button>
+                 <div class="h-4 w-px bg-gray-300"></div>
+                <button onclick="showAll()" class="${canShowMore ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowMore ? 'disabled' : ''}>
+                    Mostrar Todo
+                </button>
+                 <span class="text-xs text-gray-400 ml-4">(${productsToShow.length} de ${total})</span>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Agregar eventos para guardar cambios
+        container.querySelectorAll('input[data-field]').forEach(input => {
+          input.addEventListener('blur', saveEdit);
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveEdit.call(input);
+          });
+        });
+      }
+
+      window.showMore = function () {
+        if (visibleCount < currentProducts.length) {
+          visibleCount += 20;
+          renderProducts();
+        }
+      };
+
+      window.showLess = function () {
+        if (visibleCount > 20) {
+          visibleCount = Math.max(20, visibleCount - 20);
+          renderProducts();
+        }
+      };
+
+      window.showAll = function () {
+        if (visibleCount < currentProducts.length) {
+          visibleCount = currentProducts.length;
+          renderProducts();
+        }
+      };
+
+      async function saveEdit() {
+        const field = this.dataset.field;
+        const id = this.dataset.id;
+        let value = this.value.trim();
+
+        // Convertir tipos según el campo
+        let updateValue = value;
+        if (['precio', 'cantidad'].includes(field)) {
+          if (value === '') {
+            updateValue = null;
+          } else {
+            updateValue = field === 'precio' ? parseFloat(value) : parseInt(value, 10);
+            if (isNaN(updateValue)) {
+              // alert(`Valor inválido para ${field}`); // Silent
+              return;
+            }
+          }
+        }
+
+        const { error } = await supabaseClient
+          .from('productos')
+          .update({ [field]: updateValue })
+          .eq('id', id);
+
+        if (error) {
+          console.error(`Error al guardar ${field}: ${error.message}`);
+          this.classList.add('border-red-500');
+        } else {
+          // Feedback visual
+          const originalBorder = this.classList.contains('border-blue-400') ? 'border-blue-400' : '';
+          this.classList.remove('border-blue-400');
+          this.classList.add('border-green-400');
+          setTimeout(() => {
+            this.classList.remove('border-green-400');
+            this.classList.add('border-blue-400');
+          }, 1000);
+        }
+      }
+
+      window.markAsReviewed = async function (id) {
+        // Optimistic UI Update first? Or wait? Wait is safer.
+        const { error } = await supabaseClient.from('productos').update({ revisado: true }).eq('id', id);
+        if (error) {
+          alert('Error al marcar como revisado: ' + error.message);
+        } else {
+          const row = document.querySelector(`tr[data-id="${id}"]`);
+          if (row) {
+            row.classList.add('opacity-0', 'transform', 'translate-x-4'); // Animate out
+            setTimeout(() => row.remove(), 300);
+          }
+          currentProducts = currentProducts.filter(p => p.id !== id);
+        }
+      };
+
+      window.exportVerifiedProductsToCSV = async function () {
+        const { data, error } = await supabaseClient
+          .from('productos')
+          .select('id, sku, titulo, precio, cantidad, marca, factura, url_imagen')
+          .eq('revisado', true)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          alert(`Error al cargar productos verificados: ${error.message}`);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          alert('No hay productos verificados para exportar.');
+          return;
+        }
+
+        const headers = ['ID', 'SKU', 'Título', 'Precio', 'Cantidad', 'Marca', 'Factura', 'URL Imagen'];
+        const rows = data.map(row => [
+          `"${row.id}"`,
+          `"${(row.sku || '').replace(/"/g, '""')}"`,
+          `"${(row.titulo || '').replace(/"/g, '""')}"`,
+          row.precio !== null && row.precio !== undefined ? row.precio : '',
+          row.cantidad !== null && row.cantidad !== undefined ? row.cantidad : '',
+          `"${(row.marca || '').replace(/"/g, '""')}"`,
+          `"${(row.factura || '').replace(/"/g, '""')}"`,
+          `"${(row.url_imagen || '').replace(/"/g, '""')}"`
+        ]);
+
+        const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\\n');
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 16);
+        const filename = `productos_verificados_${timestamp}.csv`;
+
+        const blob = new Blob([`\\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      // Start Logic
+      loadProducts();
+      setInterval(loadProducts, 10000);
+    }
+  </script>
+</body>
+
+</html>
