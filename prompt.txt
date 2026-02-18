@@ -81,7 +81,7 @@ Modificaciones esteticas:
     - En pantllas grandes (desktops), al dar click en el toggle, la sidebar que esta visible en predeterminado debe de ocultarse con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar, de igual manera al dar click en el toggle, la sidebar debe de aparecer con una transicion suave y el contenido de la pagina debe de ajustarse para ocupar el espacio de la sidebar.    
 
 17/02/2026
-Correciones nuevas:
+Correciones nuevas: Puramente esteticas
 - Cambio de idioma WELCOME a BIENVENIDO
 - Quitar parrafo "Sube hasta 80 archivos y envíalos uno por uno cada 5 segundos"
 - Reemplazar columna ID por una columna llamada "Fecha", cuyos datos serán de la columna "created_at" de la base de datos de Supabase
@@ -94,8 +94,90 @@ Correciones nuevas:
 - Aumenta levemente (1 o 2 puntos) el tamaño de la imagen "Logo_empresa_noFondo.png".
 - Al final despues de la columna Revisar debe haber una columna nueva sin nombre, tan solo un icono de "papelera" que al darle click, se eliminará el producto de la lista.
 
+Correciones parte 2: Esteticas y organizativas
+-  Se debe cambiar la presentación estetica de la sección de "Subir archivos" (anexo imagen), en lugar de que se deba hacer clic en la sección "Elegir", todo el recuadro debe ser el clickeable (todo el recuadro grande animado será el "Elegir").
+- El boton "Enviar archivos" se mantendrá igual, solo que el color de fondo cambiará a rgba(253, 90, 3) y el color del texto seguirá siendo blanco. 
+- El texto "Subir archivos" estará centrado y será más grande (en el centro del recuadro clickeable), el texto de "Sin archivos seleccionados" | "X archivos seleccionados" estará debajo del texto "Subir archivos" y será más pequeño (en el centro del recuadro clickeable).
+- Los componentes "Productos Pendientes por Revisión", "Productos Revisados", filtrado, searchbar, Exportar estarán uno encima de otro en la vista de móviles, y en desktop y tablet estarán uno al lado del otro (como predeterminado).  
+- En la parte inferior izquierda de la pantalla, cambiar la versión "v1.20" por el nombre de la empresa "Alphat Service" con un pequeño logotipo usando la imagen "Logo_equipo.png" a la izquierda del texto.
+- Al tener el campo de Fecha (created_at) en la tabla, ahora seria oportuno agregar la opción de filtrado por fecha, que consiste en elegir 2 fechas (desplegar un calendario) y que la tabla muestre los productos que esten en ese rango de fechas. 
+    - A nivel de colocación este filtro por fechas estará al lado izquierdo del searchbar (en desktop y tablet), y encima de la searchbar.
 
+- En la sidebar (esquina inferior izquierda) donde esta el toggle de modo oscuro-claro, el toggle debe de ser accionable, es decir, que al darle click se cambie de modo oscuro-claro.
+    Definición de modo claro: el predeterminado que esta diseñado.
+    Definición de modo oscuro: colores naranjas se mantienen, fondo se vuelve oscuro (no necesariamente negro) y letras en blanco, botones y secciones de colores (naranja, verde) no se ven afectadas. El sidebar se mantendrá igual.  
 
+- Correción de filtrado de fecha: al desplegar el filtrado de fecha, la Start Date debe ser  máximo el dia de hoy (en el calendario), la End Date debe ser minimo el día seleccionado en la Start Date (en el calendario). Si se selecciona una fecha en la Start Date, la End Date debe de actualizarse automaticamente para que sea minimo el día seleccionado en la Start Date. En caso de que no se haya seleccionado una fecha en el Start Date, la End Date no tendrá limitaciones de selección.
 
+--- Cambio Relevante ---
+Refactorización: 
+1. Separar del archivo "extractor-de-facturas.html" el codigo script, llevar dicho script a un codigo JavaScript llamado extractor.js (en la carpeta JS), y en el archivo HTML llamar a dicho script con la etiqueta <script src="extractor.js"></script>.
+2. Separar del archivo "extractor-de-facturas.html" las secciones de style (CSS), llevar dicho CSS a un archivo CSS llamado extractor.css (en la carpeta CSS), y en el archivo HTML llamar a dicho CSS con la etiqueta <script src="https://cdn.tailwindcss.com"></script> <link rel="stylesheet" href="CSS/extractor.css">.
+3. Limpiar el HTML de "extractor-de-facturas.html" de todo el codigo script y CSS, dejando solo el HTML y las etiquetas <script src="extractor.js"></script>, <script src="https://cdn.tailwindcss.com"></script> y <link rel="stylesheet" href="CSS/extractor.css">. Verificar que el cambio se existoso y que la página funcione con normalidad (exactamente igual) tras la Refactorización.
 
+Verificar que los datos de la tabla inicial "Productos Pendientes por Revisión" sean cargados exitosamente, que no se quede en un bucle infinito de "Cargando productos..."
+
+- Implementación de la barra de búsqueda global (searchGlobal) HTML:
+1. Agrégale el atributo id="searchInput". (Listo manualmente)
+2. Agrégale el atributo id="filterSelect" (opcional, si planeas poner un selector de filtro SKU/ID/Titulo al lado, si no, omite este punto).
+3. Asegúrate de no romper las clases de Tailwind existentes.
+- Lógica y comunicación de función de busqueda SQL en extractor.js: Implementar la lógica de búsqueda por SQL (RPC) e integrarla con el sistema actual.
+1. Variables Globales: Al inicio, junto a let currentTab, agrega:
+let currentSearchTerm = '';
+let searchDebounceTimer;
+2. Modificar loadProducts: Busca la función loadProducts. Agrega esta línea al principio de la función para evitar que el auto-refresh borre una búsqueda activa:
+// Si hay una búsqueda activa, no recargar la lista por defecto
+if (currentSearchTerm.length > 0) return;
+3. Insertar Nueva Lógica: Agrega las siguientes funciones antes de renderProducts():
+// --- LÓGICA DE BÚSQUEDA (RPC SQL) ---
+// 1. Manejador del Input (Debounce)
+window.handleSearchInput = function(e) {
+    const query = e.target.value.trim();
+    currentSearchTerm = query;
+    clearTimeout(searchDebounceTimer);
+    if (query.length === 0) {
+        // Si borra el texto, recargamos la vista normal
+        loadProducts();
+        return;
+    }
+    // Esperar 300ms antes de llamar a la API
+    searchDebounceTimer = setTimeout(() => {
+        performSearch(query);
+    }, 300);
+};
+// 2. Ejecutar la búsqueda en Supabase
+async function performSearch(term) {
+    const container = document.getElementById('productsTableContainer');
+    // Mostrar Loading
+    container.innerHTML = `
+       <div class="flex items-center justify-center h-full text-gray-500 italic">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+        Buscando "${term}"...
+       </div>`;
+    try {
+        // Llamada a la función SQL 'search_products_pro'
+        const { data, error } = await supabaseClient
+            .rpc('search_products_pro', {
+                search_term: term,
+                search_mode: 'all', // Opcional: podrías conectar esto a un select
+                page_number: 1,
+                page_size: 50
+            });
+        if (error) throw error;
+        // Actualizamos los datos globales y renderizamos
+        currentProducts = data;
+        visibleCount = 50; // Mostrar más resultados en búsqueda
+        renderProducts();
+    } catch (err) {
+        console.error("Error en búsqueda:", err);
+        container.innerHTML = `<div class="text-red-500 text-center p-4">Error buscando: ${err.message}</div>`;
+    }
+}
+4. Conectar evento: Dentro de startApp(), busca donde se inicializan los listeners o al final de la función, y agrega:
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', window.handleSearchInput);
+} else {
+    console.warn("Input de búsqueda no encontrado (ID: searchInput)");
+}
 

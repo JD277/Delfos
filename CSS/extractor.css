@@ -1,0 +1,131 @@
+    /* Custom Scrollbar for Table */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+        background-color: #111827;
+        /* gray-900 */
+        color: #f3f4f6;
+        /* gray-100 */
+    }
+
+    body.dark-mode .bg-white {
+        background-color: #1f2937;
+        /* gray-800 */
+        color: #f3f4f6;
+    }
+
+    body.dark-mode .bg-gray-50 {
+        background-color: #111827;
+        /* gray-900 */
+    }
+
+    body.dark-mode .bg-gray-100 {
+        background-color: #374151;
+        /* gray-700 */
+    }
+
+    /* Text Overrides */
+    body.dark-mode .text-gray-800,
+    body.dark-mode .text-gray-700,
+    body.dark-mode .text-gray-600 {
+        color: #d1d5db;
+        /* gray-300 */
+    }
+
+    body.dark-mode .text-gray-500,
+    body.dark-mode .text-gray-400 {
+        color: #9ca3af;
+        /* gray-400 */
+    }
+
+    body.dark-mode .text-gray-300 {
+        color: #6b7280;
+        /* gray-500 */
+    }
+
+    /* Borders */
+    body.dark-mode .border-gray-200,
+    body.dark-mode .border-gray-300 {
+        border-color: #374151;
+        /* gray-700 */
+    }
+
+    body.dark-mode .border-gray-700 {
+        border-color: #4b5563;
+        /* gray-600 */
+    }
+
+    /* Inputs */
+    body.dark-mode input[type="text"],
+    body.dark-mode input[type="number"],
+    body.dark-mode input[type="date"],
+    body.dark-mode select {
+        background-color: #374151;
+        /* gray-700 */
+        color: white;
+        border-color: #4b5563;
+        /* gray-600 */
+    }
+
+    body.dark-mode input:focus {
+        border-color: #fca5a5;
+        /* orange-300 ring */
+    }
+
+    /* Table Rows */
+    body.dark-mode tbody tr:hover {
+        background-color: #374151;
+        /* gray-700 */
+    }
+
+    body.dark-mode tbody tr.odd\:bg-white {
+        background-color: #1f2937;
+        /* gray-800 */
+    }
+
+    body.dark-mode tbody tr.even\:bg-gray-50:nth-child(even) {
+        background-color: #111827;
+        /* gray-900 */
+    }
+
+    /* Specific Elements */
+    body.dark-mode .sidebar-text {
+        color: #d1d5db;
+        /* gray-300 */
+    }
+
+    body.dark-mode #sidebar {
+        background-color: #1f2937;
+        /* gray-800, keep sidebar distinct? Or keep original black? User said sidebar stays same. */
+        /* Revert sidebar to original if requested "sidebar se mantendrá igual" */
+        background-color: #1a1a1a;
+    }
+
+    /* Toggle Switch Unchecked (Light Mode) checked (Dark Mode) */
+    /* Handled by JS logic on the toggle input */
+
+    .sidebar-link {
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }

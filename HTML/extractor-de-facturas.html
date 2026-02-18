@@ -24,35 +24,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    /* Custom Scrollbar for Table */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-
-    .sidebar-link {
-      transition: all 0.3s ease;
-    }
-
-    .sidebar-link:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      transform: translateX(5px);
-    }
-  </style>
+  <link rel="stylesheet" href="../CSS/extractor.css">
 </head>
 
 <body class="bg-gray-100 font-sans h-screen flex overflow-hidden">
@@ -129,7 +101,10 @@
     <!-- Footer / Toggle -->
     <div class="p-4 border-t border-gray-700">
       <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500">v1.2.0</span>
+        <div class="flex items-center gap-2">
+          <img src="../IMG/Logo_equipo.png" alt="Alphat" class="h-6 w-auto">
+          <span class="font-bold text-gray-400 text-xs">Alphat Service</span>
+        </div>
         <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
           <input type="checkbox" name="toggle" id="toggle"
             class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" />
@@ -184,24 +159,23 @@
             </h2>
             <p class="text-gray-500 mb-6"> </p>
 
-            <div
-              class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-primary transition-colors group">
-              <h3 class="text-lg font-semibold text-gray-700 mb-4 group-hover:text-primary transition-colors">• Subir
-                archivos</h3>
+            <div class="relative group">
+              <input type="file" id="fileInput" multiple accept="image/*" class="hidden"
+                onchange="updateFileNameDisplay()" />
 
-              <div class="max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center">
-                <label
-                  class="flex-1 w-full cursor-pointer bg-white border border-gray-300 rounded-lg p-2 flex items-center shadow-sm hover:shadow-md transition">
-                  <span class="px-3 py-1 bg-gray-200 rounded text-sm font-medium mr-3">Elegir</span>
-                  <span class="text-sm text-gray-500 truncate" id="fileNameDisplay">Sin archivos seleccionados</span>
-                  <input type="file" id="fileInput" multiple accept="image/*" class="hidden"
-                    onchange="updateFileNameDisplay()" />
-                </label>
-              </div>
+              <label for="fileInput"
+                class="block bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-12 text-center hover:border-primary transition-colors cursor-pointer active:scale-[0.99] transform duration-150">
+                <div class="flex flex-col items-center justify-center space-y-2">
+                  <h3 class="text-2xl font-bold text-gray-700 group-hover:text-primary transition-colors">Subir archivos
+                  </h3>
+                  <span class="text-sm text-gray-500" id="fileNameDisplay">Sin archivos seleccionados</span>
+                </div>
+              </label>
 
-              <div class="mt-6 flex justify-start max-w-xl mx-auto">
+              <div class="mt-6 flex justify-center max-w-xl mx-auto">
                 <button id="uploadBtn" onclick="startUpload()"
-                  class="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition transform hover:scale-105 flex items-center gap-2">
+                  class="text-white font-bold py-2 px-6 rounded-lg shadow-md transition transform hover:scale-105 flex items-center gap-2"
+                  style="background-color: rgba(253, 90, 3, 1);">
                   <span>Enviar archivos</span>
                   <i class="fas fa-paper-plane"></i>
                 </button>
@@ -226,30 +200,42 @@
 
         <!-- Toolbar -->
         <div
-          class="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+          class="p-4 bg-gray-50 border-b border-gray-200 flex flex-col xl:flex-row justify-between items-center gap-4">
           <!-- Tabs Container -->
-          <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+          <div class="flex flex-col sm:flex-row w-full xl:w-auto gap-2 p-1 rounded-lg">
             <button id="tabPending" onclick="switchTab('pending')"
-              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm">
+              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm w-full sm:w-auto text-center">
               Productos Pendientes por Revisión
             </button>
             <button id="tabReviewed" onclick="switchTab('reviewed')"
-              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent">
+              class="px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent w-full sm:w-auto text-center">
               Productos Revisados
             </button>
           </div>
 
-          <div class="w-full sm:w-64 flex gap-4">
-            <div class="relative flex-1">
-              <input type="text" placeholder="Buscar..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white shadow-sm text-sm">
-              <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+          <div class="flex flex-col sm:flex-row gap-4 w-full xl:w-auto items-center">
+            <!-- Date Filter -->
+            <div class="flex gap-2 items-center w-full sm:w-auto justify-center">
+              <input type="date" id="startDateFilter" onchange="filterDates()"
+                class="border border-gray-300 rounded-lg px-2 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none w-full sm:w-auto text-gray-600">
+              <span class="text-gray-400 font-bold">-</span>
+              <input type="date" id="endDateFilter" onchange="filterDates()"
+                class="border border-gray-300 rounded-lg px-2 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none w-full sm:w-auto text-gray-600">
             </div>
-            <button onclick="exportVerifiedProductsToCSV()"
-              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2 whitespace-nowrap">
-              <i class="fas fa-file-csv"></i>
-              <span class="hidden md:inline">Exportar</span>
-            </button>
+
+            <!-- Search & Export -->
+            <div class="flex gap-4 w-full sm:w-auto">
+              <div class="relative flex-1">
+                <input type="text" id="searchInput" placeholder="Buscar..."
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white shadow-sm text-sm">
+                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+              </div>
+              <button onclick="exportVerifiedProductsToCSV()"
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fas fa-file-csv"></i>
+                <span class="hidden md:inline">Exportar</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -266,568 +252,7 @@
   </main>
 
   <!-- LOGIC SCRIPT (Preserved & Adapted) -->
-  <script>
-    // --- UI Initialization ---
-    document.addEventListener('DOMContentLoaded', () => {
-      // Set Date
-      const now = new Date();
-      const day = now.getDate().toString().padStart(2, '0');
-      const month = now.toLocaleString('default', { month: 'short' });
-      document.getElementById('currentDateDay').textContent = day;
-      document.getElementById('currentDateMonth').textContent = month;
-
-      // Load User Data
-      const userJson = localStorage.getItem('currentUser');
-      if (userJson) {
-        try {
-          const user = JSON.parse(userJson);
-          document.getElementById('userName').textContent = user.nombre || 'Usuario';
-          document.getElementById('welcomeUser').textContent = user.nombre || 'Usuario';
-          document.getElementById('userEmail').textContent = user.correo || '';
-          document.getElementById('userRole').textContent = user.tipo || 'Usuario';
-        } catch (e) {
-          console.error('Error parsing user data', e);
-        }
-      } else {
-        // Optional: Redirect to login if not authenticated
-        // window.location.href = 'index.html';
-        console.warn('No user session found.');
-      }
-
-      setupSidebarToggle();
-    });
-
-    function setupSidebarToggle() {
-      const toggleBtn = document.getElementById('sidebarToggle');
-      const closeBtn = document.getElementById('sidebarClose');
-      const sidebar = document.getElementById('sidebar');
-      const logoFull = sidebar.querySelector('.logo-full');
-      const logoIcon = sidebar.querySelector('.logo-icon');
-      const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
-      const userEmail = document.getElementById('userEmail');
-
-      function toggleSidebar() {
-        const isMobile = window.innerWidth < 768;
-
-        if (isMobile) {
-          // Mobile: Toggle visibility (translate)
-          sidebar.classList.toggle('-translate-x-full');
-        } else {
-          // Desktop: Toggle Full Visibility (w-64 vs w-0)
-          const isHidden = sidebar.classList.contains('w-0');
-
-          if (isHidden) {
-            // Show
-            sidebar.classList.remove('w-0', 'overflow-hidden');
-            sidebar.classList.add('w-64');
-            // Show Content
-            sidebarTexts.forEach(el => el.classList.remove('hidden'));
-            userEmail.classList.remove('hidden');
-            logoFull.classList.remove('hidden');
-            logoIcon.classList.add('hidden');
-          } else {
-            // Hide Completely
-            sidebar.classList.remove('w-64');
-            sidebar.classList.add('w-0', 'overflow-hidden');
-            // Hide Content
-            sidebarTexts.forEach(el => el.classList.add('hidden'));
-            userEmail.classList.add('hidden');
-            logoFull.classList.add('hidden');
-            logoIcon.classList.add('hidden');
-          }
-        }
-      }
-
-      toggleBtn.addEventListener('click', toggleSidebar);
-      if (closeBtn) closeBtn.addEventListener('click', () => {
-        // Specific close action for mobile internal button
-        sidebar.classList.add('-translate-x-full');
-      });
-
-      // Handle Resize
-      window.addEventListener('resize', () => {
-        const width = window.innerWidth;
-        if (width >= 768) {
-          sidebar.classList.remove('-translate-x-full');
-          // Ensure visible if it was hidden by mobile interaction?
-          // If it was w-0 (desktop hidden), keep it w-0? 
-          // Let's reset to default Expanded on resize to Desktop for simplicity
-          if (sidebar.classList.contains('w-0')) {
-            // Keep hidden if user hid it? Or reset? 
-            // Usually reset is safer to avoid "missing" sidebar
-          }
-        } else {
-          // Mobile default is hidden
-          sidebar.classList.add('-translate-x-full');
-          sidebar.classList.remove('w-0', 'overflow-hidden');
-          sidebar.classList.add('w-64');
-          sidebarTexts.forEach(el => el.classList.remove('hidden'));
-          userEmail.classList.remove('hidden');
-          logoFull.classList.remove('hidden');
-          logoIcon.classList.add('hidden');
-        }
-      });
-
-
-
-      // Initialize state based on screen size (Optional, CSS handles most, but JS syncs text)
-      const width = window.innerWidth;
-      if (width >= 768 && width < 1024) {
-        // Default Tablet State: Collapsed
-        sidebar.classList.remove('w-64');
-        sidebar.classList.add('w-20');
-        sidebarTexts.forEach(el => el.classList.add('hidden'));
-        userEmail.classList.add('hidden');
-        logoFull.classList.add('hidden');
-        logoIcon.classList.remove('hidden');
-      }
-    }
-
-    function updateFileNameDisplay() {
-      const input = document.getElementById('fileInput');
-      const display = document.getElementById('fileNameDisplay');
-      if (input.files.length > 0) {
-        display.textContent = `${input.files.length} archivo(s) seleccionado(s)`;
-        display.classList.remove('text-gray-500');
-        display.classList.add('text-gray-800', 'font-medium');
-      } else {
-        display.textContent = 'Sin archivos seleccionados';
-        display.classList.add('text-gray-500');
-        display.classList.remove('text-gray-800', 'font-medium');
-      }
-    }
-
-
-    // --- LOGIC FROM ORIGINAL FILE ---
-    let supabaseClient;
-    let filesToUpload = [];
-    let uploadIndex = 0;
-    let isUploading = false;
-    let isFirstLoad = true;
-    let currentProducts = [];
-    let visibleCount = 20;
-    let currentTab = 'pending'; // 'pending' or 'reviewed'
-
-    const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
-
-    // Async Load Supabase
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    script.async = true;
-    script.onload = () => initializeApp();
-    script.onerror = () => console.error('Error al cargar Supabase.');
-    document.head.appendChild(script);
-
-    function initializeApp() {
-      const { createClient } = window.supabase;
-      supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      startApp();
-    }
-
-    function startApp() {
-      const WEBHOOK_URL = 'https://fixtop-n8n.depzyb.easypanel.host/webhook/980a3ae4-0cad-46b9-af95-f4365eab7d82';
-
-      // --- Funciones de subida ---
-      function sanitizeFilename(name) {
-        return name.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase();
-      }
-
-      async function uploadFileToSupabase(file, safeName) {
-        const { error } = await supabaseClient.storage.from('facturas').upload(safeName, file, { upsert: false });
-        if (error) throw new Error(error.message);
-        return `${SUPABASE_URL}/storage/v1/object/public/facturas/${safeName}`;
-      }
-
-      async function sendToWebhook(imageUrl, filename) {
-        const res = await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: imageUrl, filename })
-        });
-        if (!res.ok) throw new Error(`Webhook falló: ${res.status}`);
-      }
-
-      function updateProgress(current, total, message) {
-        const percent = Math.round((current / total) * 100);
-        document.getElementById('progressBar').style.width = `${percent}%`;
-        document.getElementById('progressText').textContent = `${message} (${current}/${total})`;
-      }
-
-      async function processNextFile() {
-        if (uploadIndex >= filesToUpload.length || !isUploading) return;
-
-        const file = filesToUpload[uploadIndex];
-        const safeName = sanitizeFilename(file.name);
-        updateProgress(uploadIndex + 1, filesToUpload.length, `Subiendo ${file.name}...`);
-
-        try {
-          const imageUrl = await uploadFileToSupabase(file, safeName);
-          await sendToWebhook(imageUrl, safeName);
-        } catch (err) {
-          console.error('Error:', err);
-          // alert(`Error en ${file.name}: ${err.message}`); // Silent error for better UX? or Toast?
-        }
-
-        uploadIndex++;
-
-        if (uploadIndex < filesToUpload.length) {
-          setTimeout(processNextFile, 5000);
-        } else {
-          isUploading = false;
-          document.getElementById('uploadBtn').disabled = false;
-          document.getElementById('productUploadBtnText').textContent = 'Enviar archivos'; // Reset Text
-          document.getElementById('progressText').textContent = '✅ Envío completado.';
-          loadProducts(); // Actualizar tabla
-        }
-      }
-
-      window.startUpload = function () {
-        const files = Array.from(document.getElementById('fileInput').files);
-        if (files.length === 0) return alert('Selecciona al menos un archivo.');
-        if (files.length > 80) return alert('Máximo 80 archivos por lote.');
-
-        filesToUpload = files;
-        uploadIndex = 0;
-        isUploading = true;
-
-        document.getElementById('progressContainer').classList.remove('hidden');
-        document.getElementById('uploadBtn').disabled = true;
-        // document.getElementById('uploadBtn').classList.add('opacity-50', 'cursor-not-allowed');
-        document.getElementById('progressBar').style.width = '0%';
-        document.getElementById('progressText').textContent = 'Preparando...';
-
-        processNextFile();
-      };
-
-      // --- Gestión de productos con edición en línea ---
-
-      async function loadProducts() {
-        const container = document.getElementById('productsTableContainer');
-        const isPending = currentTab === 'pending';
-
-        const { data, error } = await supabaseClient
-          .from('productos')
-          .select('*')
-          .eq('revisado', !isPending)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          container.innerHTML = `
-                        <div class="flex items-center justify-center h-full text-red-500">
-                             ❌ Error al cargar productos: ${error.message}
-                        </div>`;
-          isFirstLoad = false;
-          return;
-        }
-
-        // Evitar refresco si los datos no cambiaron
-        if (JSON.stringify(data) === JSON.stringify(currentProducts)) {
-          if (isFirstLoad) {
-            if (!data || data.length === 0) {
-              container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No hay productos ${currentTab === 'pending' ? 'pendientes' : 'revisados'}.</div>`;
-            }
-            isFirstLoad = false;
-          }
-          return;
-        }
-
-        currentProducts = data;
-        isFirstLoad = false;
-        renderProducts();
-      }
-
-      window.switchTab = function (tab) {
-        if (currentTab === tab) return;
-        currentTab = tab;
-        visibleCount = 20; // Reset pagination
-        currentProducts = []; // Clear current data to force refresh
-        isFirstLoad = true; // Show loader logic
-
-        // Toggle Styles
-        const tabPending = document.getElementById('tabPending');
-        const tabReviewed = document.getElementById('tabReviewed');
-
-        if (tab === 'pending') {
-          tabPending.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm";
-          tabReviewed.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent";
-        } else {
-          tabReviewed.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors bg-orange-600 text-white shadow-sm";
-          tabPending.className = "px-4 py-2 rounded-lg text-sm font-bold transition-colors text-orange-600 hover:bg-orange-50 bg-transparent";
-        }
-
-        // Show Loading
-        const container = document.getElementById('productsTableContainer');
-        container.innerHTML = `
-           <div class="flex items-center justify-center h-full text-gray-500 italic">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-3"></div>
-            Cargando productos...
-           </div>`;
-
-        loadProducts();
-      };
-
-      function renderProducts() {
-        const container = document.getElementById('productsTableContainer');
-        const data = currentProducts;
-
-        if (!data || data.length === 0) {
-          container.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400">No hay productos ${currentTab === 'pending' ? 'pendientes' : 'revisados'}.</div>`;
-          return;
-        }
-
-        const productsToShow = data.slice(0, visibleCount);
-        const total = data.length;
-
-        // Table Construction with Tailwind Classes
-        let html = `
-                <table class="w-full text-left border-collapse">
-                    <thead class="text-white sticky top-0 z-10" style="background-color: rgba(253, 90, 3, 1);">
-                        <tr>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tl-lg">Fecha</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">SKU</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Título</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Precio</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Cantidad</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Marca</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Factura</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Imagen</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider text-center">${currentTab === 'pending' ? 'Revisar' : 'Validado'}</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tr-lg text-center"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white text-gray-800">
-                `;
-
-        productsToShow.forEach(row => {
-          const date = new Date(row.created_at).toLocaleDateString();
-          const isChecked = currentTab === 'reviewed' ? 'checked' : '';
-          const actionCell = `<input type="checkbox" onchange="markAsReviewed('${row.id}', this.checked)" ${isChecked} class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 border-gray-300 cursor-pointer" />`;
-
-          html += `
-                    <tr class="hover:bg-gray-100 transition-colors odd:bg-white even:bg-gray-50 text-gray-800" data-id="${row.id}">
-                        <td class="p-4 text-sm font-mono text-gray-600">${date}</td>
-                        <td class="p-4">
-                            <input type="text" data-field="sku" data-id="${row.id}" value="${(row.sku || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
-                        </td>
-                        <td class="p-4">
-                            <input type="text" data-field="titulo" data-id="${row.id}" value="${(row.titulo || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
-                        </td>
-                        <td class="p-4">
-                            <div class="flex items-center">
-                                <span class="text-gray-500 mr-1">$</span>
-                                <input type="number" step="0.01" data-field="precio" data-id="${row.id}" value="${row.precio || ''}" 
-                                class="w-20 bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 text-right" />
-                            </div>
-                        </td>
-                        <td class="p-4">
-                            <input type="number" data-field="cantidad" data-id="${row.id}" value="${row.cantidad || ''}" 
-                            class="w-16 bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 text-center" />
-                        </td>
-                        <td class="p-4">
-                            <input type="text" data-field="marca" data-id="${row.id}" value="${(row.marca || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
-                        </td>
-                        <td class="p-4">
-                            <input type="text" data-field="factura" data-id="${row.id}" value="${(row.factura || '').replace(/"/g, '&quot;')}" 
-                            class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 placeholder-gray-400" placeholder="---" />
-                        </td>
-                        <td class="p-4">
-                            <a href="${row.url_imagen}" target="_blank" class="text-blue-600 hover:text-blue-800 underline text-sm">Ver</a>
-                        </td>
-                        <td class="p-4 text-center">
-                            ${actionCell}
-                        </td>
-                        <td class="p-4 text-center">
-                             <button onclick="deleteProduct('${row.id}')" class="text-gray-400 hover:text-red-500 transition-colors focus:outline-none" title="Eliminar">
-                                 <i class="fas fa-trash"></i>
-                             </button>
-                        </td>
-                    </tr>
-                `;
-        });
-
-        html += '</tbody></table>';
-
-        const canShowMore = visibleCount < total;
-        const canShowLess = visibleCount > 20;
-
-        html += `
-            <div class="flex justify-center items-center p-4 space-x-4 bg-white border-t border-gray-200">
-                <button onclick="showLess()" class="${canShowLess ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowLess ? 'disabled' : ''}>
-                    Mostrar menos
-                </button>
-                <div class="h-4 w-px bg-gray-300"></div>
-                <button onclick="showMore()" class="${canShowMore ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowMore ? 'disabled' : ''}>
-                    Mostrar más
-                </button>
-                 <div class="h-4 w-px bg-gray-300"></div>
-                <button onclick="showAll()" class="${canShowMore ? 'text-primary hover:text-blue-700 font-medium transition-colors' : 'text-gray-400 cursor-not-allowed'}" ${!canShowMore ? 'disabled' : ''}>
-                    Mostrar Todo
-                </button>
-                 <span class="text-xs text-gray-400 ml-4">(${productsToShow.length} de ${total})</span>
-            </div>
-        `;
-
-        container.innerHTML = html;
-
-        // Agregar eventos para guardar cambios
-        container.querySelectorAll('input[data-field]').forEach(input => {
-          input.addEventListener('blur', saveEdit);
-          input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveEdit.call(input);
-          });
-        });
-      }
-
-      window.showMore = function () {
-        if (visibleCount < currentProducts.length) {
-          visibleCount += 20;
-          renderProducts();
-        }
-      };
-
-      window.showLess = function () {
-        if (visibleCount > 20) {
-          visibleCount = Math.max(20, visibleCount - 20);
-          renderProducts();
-        }
-      };
-
-      window.showAll = function () {
-        if (visibleCount < currentProducts.length) {
-          visibleCount = currentProducts.length;
-          renderProducts();
-        }
-      };
-
-      async function saveEdit() {
-        const field = this.dataset.field;
-        const id = this.dataset.id;
-        let value = this.value.trim();
-
-        // Convertir tipos según el campo
-        let updateValue = value;
-        if (['precio', 'cantidad'].includes(field)) {
-          if (value === '') {
-            updateValue = null;
-          } else {
-            updateValue = field === 'precio' ? parseFloat(value) : parseInt(value, 10);
-            if (isNaN(updateValue)) {
-              // alert(`Valor inválido para ${field}`); // Silent
-              return;
-            }
-          }
-        }
-
-        const { error } = await supabaseClient
-          .from('productos')
-          .update({ [field]: updateValue })
-          .eq('id', id);
-
-        if (error) {
-          console.error(`Error al guardar ${field}: ${error.message}`);
-          this.classList.add('border-red-500');
-        } else {
-          // Feedback visual
-          const originalBorder = this.classList.contains('border-blue-400') ? 'border-blue-400' : '';
-          this.classList.remove('border-blue-400');
-          this.classList.add('border-green-400');
-          setTimeout(() => {
-            this.classList.remove('border-green-400');
-            this.classList.add('border-blue-400');
-          }, 1000);
-        }
-      }
-
-      window.markAsReviewed = async function (id, newState) {
-        const { error } = await supabaseClient.from('productos').update({ revisado: newState }).eq('id', id);
-        if (error) {
-          alert('Error al actualizar estado: ' + error.message);
-          const checkbox = document.querySelector(`tr[data-id="${id}"] input[type="checkbox"]`);
-          if (checkbox) checkbox.checked = !newState;
-        } else {
-          const row = document.querySelector(`tr[data-id="${id}"]`);
-          if (row) {
-            row.classList.add('opacity-0', 'transform', 'translate-x-4');
-            setTimeout(() => {
-              row.remove();
-              loadProducts();
-            }, 300);
-          }
-        }
-      };
-
-      window.deleteProduct = async function (id) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
-
-        const { error } = await supabaseClient.from('productos').delete().eq('id', id);
-        if (error) {
-          alert('Error al eliminar: ' + error.message);
-        } else {
-          const row = document.querySelector(`tr[data-id="${id}"]`);
-          if (row) {
-            row.classList.add('opacity-0', 'transform', 'scale-95');
-            setTimeout(() => {
-              row.remove();
-              loadProducts();
-            }, 300);
-          }
-        }
-      };
-
-      window.exportVerifiedProductsToCSV = async function () {
-        const { data, error } = await supabaseClient
-          .from('productos')
-          .select('id, sku, titulo, precio, cantidad, marca, factura, url_imagen')
-          .eq('revisado', true)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          alert(`Error al cargar productos verificados: ${error.message}`);
-          return;
-        }
-
-        if (!data || data.length === 0) {
-          alert('No hay productos verificados para exportar.');
-          return;
-        }
-
-        const headers = ['ID', 'SKU', 'Título', 'Precio', 'Cantidad', 'Marca', 'Factura', 'URL Imagen'];
-        const rows = data.map(row => [
-          `"${row.id}"`,
-          `"${(row.sku || '').replace(/"/g, '""')}"`,
-          `"${(row.titulo || '').replace(/"/g, '""')}"`,
-          row.precio !== null && row.precio !== undefined ? row.precio : '',
-          row.cantidad !== null && row.cantidad !== undefined ? row.cantidad : '',
-          `"${(row.marca || '').replace(/"/g, '""')}"`,
-          `"${(row.factura || '').replace(/"/g, '""')}"`,
-          `"${(row.url_imagen || '').replace(/"/g, '""')}"`
-        ]);
-
-        const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\\n');
-        const now = new Date();
-        const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 16);
-        const filename = `productos_verificados_${timestamp}.csv`;
-
-        const blob = new Blob([`\\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      };
-
-      // Start Logic
-      loadProducts();
-      setInterval(loadProducts, 10000);
-    }
-  </script>
+  <script src="../JS/extractor.js"></script>
 </body>
 
 </html>
