@@ -181,3 +181,26 @@ if (searchInput) {
     console.warn("Input de búsqueda no encontrado (ID: searchInput)");
 }
 
+Separación lógica de la inicialización de Supabase (dia 2, 18-02-2026):
+- Crear archivo supabase-client.js en la carpeta JS/shared (ya listo manualmente)
+- Pega el siguiente código JavaScript que inicializa el cliente de Supabase y lo expone globalmente en window.sbClient
+- Manten la lógica de extracto.js para que funcione correctamente
+
+- También hacer ese cambio en script.js (por consecuencia en index.html), pero claro manteniendo la lógica de extracto.js para que funcione correctamente.
+// js/shared/supabase-client.js
+
+const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
+
+// Verificamos si la librería de Supabase se cargó desde el CDN
+if (typeof window.supabase !== 'undefined') {
+    // Inicializamos y lo guardamos en una variable global 'sbClient'
+    window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log("✅ Supabase inicializado globalmente.");
+} else {
+    console.error("❌ La librería de Supabase no está cargada. Asegúrate de incluir el script del CDN en el HTML antes de este archivo.");
+}
+
+Filtrado por SKU, ID y Título (dia 3, 19-02-2026):
+- Implementar la lógica de filtrado por SKU, ID y Título en extractor.js
+- Agregar un select en el HTML para seleccionar el tipo de filtro, justo al lado del input de búsqueda global.  

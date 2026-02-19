@@ -7,12 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // === Supabase Configuration ===
-    const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
-
-    // Initialize Supabase Client
-    // Ensure supabase object is available from CDN
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    // === Supabase Configuration ===
+    // Initialized globally in shared/supabase-client.js
+    const supabase = window.sbClient;
 
     if (!supabase) {
         console.error('Supabase library not loaded.');

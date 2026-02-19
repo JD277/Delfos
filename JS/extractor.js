@@ -181,7 +181,7 @@ function updateFileNameDisplay() {
 
 
 // --- LOGIC FROM ORIGINAL FILE ---
-let supabaseClient;
+let supabaseClient = window.sbClient;
 let filesToUpload = [];
 let uploadIndex = 0;
 let isUploading = false;
@@ -192,32 +192,11 @@ let currentTab = 'pending'; // 'pending' or 'reviewed'
 let currentSearchTerm = '';
 let searchDebounceTimer;
 
-const SUPABASE_URL = 'https://voedeobojnlsjfxhkbhy.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZWRlb2Jvam5sc2pmeGhrYmh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODM3MzcsImV4cCI6MjA3MTU1OTczN30.ySOeKnQLKomzyh3tFSaNJdiHD5amS2fmSpKFzFZJNLA';
-
-// Async Load Supabase logic moved to HTML usually, but here we init app
-// The HTML has the CDN script. So window.supabase should be available.
-
-// Check if Supabase is loaded, if not wait?
-// The script in HTML has onload=initializeApp. 
-// Since we are moving this to an external file, we should probably expose initializeApp to window 
-// or just run it if window.supabase exists.
-
-// Better approach: Expose initializeApp mainly.
-
-window.initializeApp = function () {
-    if (window.supabase) {
-        const { createClient } = window.supabase;
-        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        startApp();
-    } else {
-        console.error('Supabase library not loaded');
-    }
-}
-
-// Check if Supabase script is already loaded (race condition)
-if (window.supabase) {
-    window.initializeApp();
+// Check if Supabase is initialized
+if (supabaseClient) {
+    startApp();
+} else {
+    console.error('Supabase client not initialized globally');
 }
 
 function startApp() {
@@ -229,9 +208,9 @@ function startApp() {
     }
 
     async function uploadFileToSupabase(file, safeName) {
-        const { error } = await supabaseClient.storage.from('facturas').upload(safeName, file, { upsert: false });
+        const { error } = await supabaseClient.storage.from('id_factura').upload(safeName, file, { upsert: false });
         if (error) throw new Error(error.message);
-        return `${SUPABASE_URL}/storage/v1/object/public/facturas/${safeName}`;
+        return `${SUPABASE_URL}/storage/v1/object/public/id_factura/${safeName}`;
     }
 
     async function sendToWebhook(imageUrl, filename) {
@@ -422,12 +401,17 @@ function startApp() {
            </div>`;
 
         try {
+            // Obtener el modo de búsqueda del select
+            // Obtener el modo de búsqueda del select (Safe)
+            const modeElement = document.getElementById('searchMode');
+            const searchMode = modeElement ? modeElement.value : 'all';
+
             // Llamada a la función SQL 'search_products_pro'
             // Nota: Esta función debe existir en Supabase
             const { data, error } = await supabaseClient
                 .rpc('search_products_pro', {
                     search_term: term,
-                    search_mode: 'all', // Opcional: podrías conectar esto a un select
+                    search_mode: searchMode,
                     page_number: 1,
                     page_size: 50
                 });
@@ -468,7 +452,7 @@ function startApp() {
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Precio</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Cantidad</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Marca</th>
-                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">Factura</th>
+                            <th class="p-4 text-sm font-semibold uppercase tracking-wider">ID Factura</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider">Imagen</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider text-center">${currentTab === 'pending' ? 'Revisar' : 'Validado'}</th>
                             <th class="p-4 text-sm font-semibold uppercase tracking-wider rounded-tr-lg text-center"></th>
@@ -509,7 +493,7 @@ function startApp() {
                             class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1" />
                         </td>
                         <td class="p-4">
-                            <input type="text" data-field="factura" data-id="${row.id}" value="${(row.factura || '').replace(/"/g, '&quot;')}" 
+                            <input type="text" data-field="id_factura" data-id="${row.id}" value="${(row.id_factura || '').replace(/"/g, '&quot;')}" 
                             class="w-full bg-transparent border-b border-gray-300 focus:border-orange-500 text-gray-800 focus:outline-none transition-colors text-sm px-1 py-1 placeholder-gray-400" placeholder="---" />
                         </td>
                         <td class="p-4">
@@ -659,7 +643,7 @@ function startApp() {
     window.exportVerifiedProductsToCSV = async function () {
         const { data, error } = await supabaseClient
             .from('productos')
-            .select('id, sku, titulo, precio, cantidad, marca, factura, url_imagen')
+            .select('id, sku, titulo, precio, cantidad, marca, id_factura, url_imagen')
             .eq('revisado', true)
             .order('created_at', { ascending: false });
 
@@ -673,7 +657,7 @@ function startApp() {
             return;
         }
 
-        const headers = ['ID', 'SKU', 'Título', 'Precio', 'Cantidad', 'Marca', 'Factura', 'URL Imagen'];
+        const headers = ['ID', 'SKU', 'Título', 'Precio', 'Cantidad', 'Marca', 'ID Factura', 'URL Imagen'];
         const rows = data.map(row => [
             `"${row.id}"`,
             `"${(row.sku || '').replace(/"/g, '""')}"`,
@@ -681,7 +665,7 @@ function startApp() {
             row.precio !== null && row.precio !== undefined ? row.precio : '',
             row.cantidad !== null && row.cantidad !== undefined ? row.cantidad : '',
             `"${(row.marca || '').replace(/"/g, '""')}"`,
-            `"${(row.factura || '').replace(/"/g, '""')}"`,
+            `"${(row.id_factura || '').replace(/"/g, '""')}"`,
             `"${(row.url_imagen || '').replace(/"/g, '""')}"`
         ]);
 
@@ -708,6 +692,18 @@ function startApp() {
     } else {
         console.warn("Input de búsqueda no encontrado (ID: searchInput)");
     }
+
+    // Filtro Search Trigger
+    const modeElement = document.getElementById('searchMode');
+    if (modeElement) {
+        modeElement.addEventListener('change', () => {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                performSearch(query);
+            }
+        });
+    }
+
     loadProducts();
     setInterval(loadProducts, 10000);
 }

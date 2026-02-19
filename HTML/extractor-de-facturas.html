@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../JS/shared/supabase-client.js"></script>
   <link rel="stylesheet" href="../CSS/extractor.css">
 </head>
 
@@ -225,6 +226,13 @@
 
             <!-- Search & Export -->
             <div class="flex gap-4 w-full sm:w-auto">
+              <select id="searchMode"
+                class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block p-2.5 outline-none">
+                <option value="all" selected>Todo</option>
+                <option value="sku">SKU</option>
+                <option value="titulo">Título</option>
+                <option value="id">ID</option>
+              </select>
               <div class="relative flex-1">
                 <input type="text" id="searchInput" placeholder="Buscar..."
                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white shadow-sm text-sm">
