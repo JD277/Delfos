@@ -208,9 +208,9 @@ function startApp() {
     }
 
     async function uploadFileToSupabase(file, safeName) {
-        const { error } = await supabaseClient.storage.from('id_factura').upload(safeName, file, { upsert: false });
+        const { error } = await supabaseClient.storage.from('facturas').upload(safeName, file, { upsert: false });
         if (error) throw new Error(error.message);
-        return `${SUPABASE_URL}/storage/v1/object/public/id_factura/${safeName}`;
+        return `${window.SUPABASE_URL}/storage/v1/object/public/facturas/${safeName}`;
     }
 
     async function sendToWebhook(imageUrl, filename) {
